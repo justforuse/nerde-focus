@@ -1,10 +1,10 @@
 (function createChannel() {
-    //Create a port with background page for continous message communication
-    var port = chrome.extension.connect({
+    // Create a port with service worker for continuous message communication
+    var port = chrome.runtime.connect({
         name: "nerdeFocusChromeExtension"
     });
 
-    // Listen to messages from the background page
+    // Listen to messages from the service worker
     port.onMessage.addListener(function (message) {
         if (message.sender.tab.id == chrome.devtools.inspectedWindow.tabId) {
             if (message.content.action === 'list' && !(message.content.itemTag === 'BODY' && message.content.framed)) {
@@ -21,7 +21,6 @@
                     '</li>'
                 ).scrollTop(999999999);
             } else if (message.content.action === 'pageLoaded') {
-
                 if (!message.content.framed) {
                     $('#history').append('<li class="url">Page Loaded [' + message.content.url + ']</li>').scrollTop(999999999);
                 }
@@ -44,13 +43,12 @@
                 }
             }
         }
-        //port.postMessage(message);
     });
 }());
 
 function sendObjectToInspectedPage(message) {
     message.tabId = chrome.devtools.inspectedWindow.tabId;
-    chrome.extension.sendMessage(message);
+    chrome.runtime.sendMessage(message);
 }
 
 function hexToRgb(hex) {
@@ -101,4 +99,4 @@ $('#colorPicker').change(function () {
     sendObjectToInspectedPage({action: "command", content: "updateColor", rgb: hexToRgb($(this).val())});
 });
 
-$('body').addClass(chrome.devtools.panels.themeName)
+$('body').addClass(chrome.devtools.panels.themeName);

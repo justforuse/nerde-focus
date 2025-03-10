@@ -1,7 +1,7 @@
 {
   "name": "NerdeFocus",
-  "version": "0.3.2",
-  "manifest_version": 2,
+  "version": "0.3.3",
+  "manifest_version": 3,
   "description": "Quickly debug focus problems when testing a page for accessibility issues.",
   "homepage_url": "https://github.com/wizzyfx/nerdeFocusPlugIn",
   "devtools_page": "src/devtools/devtools.html",
@@ -11,26 +11,22 @@
     "128": "icons/icon128.png"
   },
   "background": {
-    "scripts": [
-      "src/bg/background.js"
-    ],
-    "persistent": false
+    "service_worker": "src/bg/background.js"
   },
-  "permissions": [
-    "http://*/*",
-    "https://*/*"
-  ],
   "content_scripts": [
     {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "all_frames": true,
+      "matches": ["<all_urls>"],
       "js": [
         "vendor/jquery-3.2.1.slim.min.js",
         "src/inject/inject.js"
       ]
     }
+  ],
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ]
 }

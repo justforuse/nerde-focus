@@ -15,7 +15,7 @@ var NerdeFocus = (function () {
     var inFrame = window.self !== window.top;
 
     var sendObjectToDevTools = function (message) {
-        chrome.extension.sendMessage(message);
+        chrome.runtime.sendMessage(message);
     };
 
     // https://github.com/yamadapc/jquery-getpath
@@ -138,7 +138,7 @@ var NerdeFocus = (function () {
 
             $('#nerdeFocusOverlay').css('left', elementLeft + 'px').css('top', elementTop + 'px').css('width', elementWidth + 'px').css('height', elementHeight + 'px');
         }
-    }
+    };
 
     var resetChecker;
     var checkReset = function () {
@@ -212,10 +212,4 @@ var NerdeFocus = (function () {
     $(document).ready(function () {
         initialize();
     });
-
-    // return {
-    //     getFocus: function () {
-    //         console.log(highlightColor);
-    //     }
-    // };
 })();
