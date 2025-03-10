@@ -1,43 +1,45 @@
-// Chrome automatically creates a background.html page for this to execute.
-// This can access the inspected page via executeScript
-//
-// Can use:
-// chrome.tabs.*
-// chrome.extension.*
+// Service worker for Manifest V3
+// This replaces the background.html page from V2
 
+// Connection handler for devtools panel
 chrome.runtime.onConnect.addListener(function (port) {
-
     var extensionListener = function (message, sender) {
         if (message.tabId && message.content) {
             if (message.action === 'code') {
-                //Evaluate script in inspectedPage
-                chrome.tabs.executeScript(message.tabId, {code: message.content});
+                // Execute script in inspected page
+                chrome.scripting.executeScript({
+                    target: { tabId: message.tabId },
+                    func: (code) => {
+                        // Wrap in a function to avoid direct eval
+                        return new Function(code)();
+                    },
+                    args: [message.content]
+                });
             } else if (message.action === 'script') {
-                //Attach script to inspectedPage
-                chrome.tabs.executeScript(message.tabId, {file: message.content});
+                // Attach script to inspected page
+                chrome.scripting.executeScript({
+                    target: { tabId: message.tabId },
+                    files: [message.content]
+                });
             } else {
-                //Pass message to inspectedPage
+                // Pass message to inspected page
                 chrome.tabs.sendMessage(message.tabId, message);
             }
         } else {
-            // This accepts messages from the inspectedPage and sends them to the panel
+            // Pass messages from inspected page to the panel
             port.postMessage({content: message, sender: sender});
         }
-    }
+    };
 
-    // Listens to messages sent from the panel
-    chrome.extension.onMessage.addListener(extensionListener);
+    // Listen for messages from the panel
+    chrome.runtime.onMessage.addListener(extensionListener);
 
-    port.onDisconnect.addListener(function (port) {
-        chrome.extension.onMessage.removeListener(extensionListener);
+    port.onDisconnect.addListener(function () {
+        chrome.runtime.onMessage.removeListener(extensionListener);
     });
-
-    // port.onMessage.addListener(function (message) {
-    //     port.postMessage(message);
-    // });
-
 });
 
+// Simple listener to keep service worker active
 chrome.runtime.onMessage.addListener(function (request, sender) {
     return true;
 });
