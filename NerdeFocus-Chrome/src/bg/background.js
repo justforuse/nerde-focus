@@ -40,6 +40,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 });
 
 // Simple listener to keep service worker active
-chrome.runtime.onMessage.addListener(function (request, sender) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    sendResponse({});
     return true;
 });
